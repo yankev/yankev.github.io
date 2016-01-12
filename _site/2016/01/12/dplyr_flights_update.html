@@ -36,6 +36,10 @@
         
           
         
+          
+          <a class="page-link" href="/todo/">To do</a>
+          
+        
         <img src="/images/logo.jpg", height="56px">
       </div>
     </nav>
@@ -74,8 +78,8 @@
 <p>We’re going to be looking at the nycflights13 dataset, which contains records of all the flights departing from NYC airports in 2013. 
 Let’s take a look at the data:</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">library</span><span class="p">(</span><span class="n">nycflights13</span><span class="p">)</span>
-<span class="n">head</span><span class="p">(</span><span class="n">flights</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>nycflights13<span class="p">)</span>
+<span class="kp">head</span><span class="p">(</span>flights<span class="p">)</span></code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-text" data-lang="text">## Source: local data frame [6 x 16]
 ## 
@@ -90,24 +94,24 @@ Let’s take a look at the data:</p>
 ## Variables not shown: flight (int), origin (chr), dest (chr), air_time
 ##   (dbl), distance (dbl), hour (dbl), minute (dbl)</code></pre></figure>
 
-<p>To get started with the <code class="highlighter-rouge">select</code> function, let’s figure out a few ways select dep_time, dep_delay, arr_time, and arr_delay from flights.</p>
+<p>To get started with the <code>select</code> function, let’s figure out a few ways select dep_time, dep_delay, arr_time, and arr_delay from flights.</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#because they are side by side, we can do the following
-</span><span class="n">select</span><span class="p">(</span><span class="n">flights</span><span class="p">,</span> <span class="m">4</span><span class="o">:</span><span class="m">7</span><span class="p">)</span>
-<span class="c1">#if they weren't,  we could create a list:
-</span><span class="n">select</span><span class="p">(</span><span class="n">flights</span><span class="p">,</span> <span class="n">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">7</span><span class="p">))</span>
-<span class="c1">#we can also list them out individually
-</span><span class="n">select</span><span class="p">(</span><span class="n">flights</span><span class="p">,</span> <span class="n">dep_time</span><span class="p">,</span><span class="n">dep_delay</span><span class="p">,</span><span class="n">arr_time</span><span class="p">,</span><span class="n">arr_delay</span><span class="p">)</span>
-<span class="c1">#or using starts_with/ends_with
-</span><span class="n">select</span><span class="p">(</span><span class="n">flights</span><span class="p">,</span> <span class="n">starts_with</span><span class="p">(</span><span class="s2">"dep"</span><span class="p">),</span><span class="n">starts_with</span><span class="p">(</span><span class="s2">"arr"</span><span class="p">))</span>
-<span class="c1">#or
-</span><span class="n">select</span><span class="p">(</span><span class="n">flights</span><span class="p">,</span> <span class="n">ends_with</span><span class="p">(</span><span class="s2">"delay"</span><span class="p">),</span><span class="n">ends_with</span><span class="p">(</span><span class="s2">"time"</span><span class="p">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#because they are side by side, we can do the following</span>
+select<span class="p">(</span>flights<span class="p">,</span> <span class="m">4</span><span class="o">:</span><span class="m">7</span><span class="p">)</span>
+<span class="c1">#if they weren&#39;t,  we could create a list:</span>
+select<span class="p">(</span>flights<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">6</span><span class="p">,</span><span class="m">7</span><span class="p">))</span>
+<span class="c1">#we can also list them out individually</span>
+select<span class="p">(</span>flights<span class="p">,</span> dep_time<span class="p">,</span>dep_delay<span class="p">,</span>arr_time<span class="p">,</span>arr_delay<span class="p">)</span>
+<span class="c1">#or using starts_with/ends_with</span>
+select<span class="p">(</span>flights<span class="p">,</span> starts_with<span class="p">(</span><span class="s">&quot;dep&quot;</span><span class="p">),</span>starts_with<span class="p">(</span><span class="s">&quot;arr&quot;</span><span class="p">))</span>
+<span class="c1">#or</span>
+select<span class="p">(</span>flights<span class="p">,</span> ends_with<span class="p">(</span><span class="s">&quot;delay&quot;</span><span class="p">),</span>ends_with<span class="p">(</span><span class="s">&quot;time&quot;</span><span class="p">))</span></code></pre></figure>
 
-<p>Let’s now try <code class="highlighter-rouge">mutate</code>. We can use this function in order to create new variables in our data frame.
+<p>Let’s now try <code>mutate</code>. We can use this function in order to create new variables in our data frame.
 Perhaps we can create a variable that will give us the total delay of the flights.</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">temp</span> <span class="o">&lt;-</span> <span class="n">mutate</span><span class="p">(</span><span class="n">flights</span><span class="p">,</span> <span class="n">total_delay</span><span class="o">=</span> <span class="n">dep_delay</span> <span class="o">+</span> <span class="n">arr_delay</span><span class="p">)</span> 
-<span class="n">select</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">ends_with</span><span class="p">(</span><span class="s2">"delay"</span><span class="p">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r">temp <span class="o">&lt;-</span> mutate<span class="p">(</span>flights<span class="p">,</span> total_delay<span class="o">=</span> dep_delay <span class="o">+</span> arr_delay<span class="p">)</span> 
+select<span class="p">(</span>temp<span class="p">,</span> ends_with<span class="p">(</span><span class="s">&quot;delay&quot;</span><span class="p">))</span></code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-text" data-lang="text">## Source: local data frame [336,776 x 3]
 ## 
@@ -125,29 +129,29 @@ Perhaps we can create a variable that will give us the total delay of the flight
 ## 10        -2         8           6
 ## ..       ...       ...         ...</code></pre></figure>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">g</span><span class="o">&lt;-</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">temp</span><span class="p">)</span>
-<span class="n">g</span> <span class="o">+</span> <span class="n">geom_bar</span><span class="p">(</span><span class="n">map</span><span class="o">=</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">total_delay</span><span class="p">),</span> <span class="n">fill</span><span class="o">=</span><span class="s2">"maroon"</span><span class="p">)</span> <span class="o">+</span> <span class="n">xlim</span><span class="p">(</span><span class="m">-100</span><span class="p">,</span><span class="m">1000</span><span class="p">)</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"A look at the distribution of delays"</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r">g<span class="o">&lt;-</span>ggplot<span class="p">(</span>data<span class="o">=</span>temp<span class="p">)</span>
+g <span class="o">+</span> geom_bar<span class="p">(</span>map<span class="o">=</span>aes<span class="p">(</span>x<span class="o">=</span>total_delay<span class="p">),</span> fill<span class="o">=</span><span class="s">&quot;maroon&quot;</span><span class="p">)</span> <span class="o">+</span> xlim<span class="p">(</span><span class="m">-100</span><span class="p">,</span><span class="m">1000</span><span class="p">)</span> <span class="o">+</span> labs<span class="p">(</span>title<span class="o">=</span><span class="s">&quot;A look at the distribution of delays&quot;</span><span class="p">)</span></code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-text" data-lang="text">## Warning: Removed 9482 rows containing non-finite values (stat_count).</code></pre></figure>
 
 <p><img src="http://yankev.github.io/figs/dplyr_flights/unnamed-chunk-4-1.png" alt="center" /></p>
 
-<p>What we see is a right-skewed distribution. We can confirm this because the <strong>mean</strong> is: <code class="highlighter-rouge">19.4505325</code> which is larger than the <strong>median</strong>: <code class="highlighter-rouge">-6</code>, which indicates a right-skewed distribution.</p>
+<p>What we see is a right-skewed distribution. We can confirm this because the <strong>mean</strong> is: <code>19.4505325</code> which is larger than the <strong>median</strong>: <code>-6</code>, which indicates a right-skewed distribution.</p>
 
-<p>Perhaps now we can look at all the flights with reasonable arrival and departing delays (e.g. let’s assume that 2 hrs is reasonable). We will do this by using the <code class="highlighter-rouge">filter</code> function supplied with dplyr.</p>
+<p>Perhaps now we can look at all the flights with reasonable arrival and departing delays (e.g. let’s assume that 2 hrs is reasonable). We will do this by using the <code>filter</code> function supplied with dplyr.</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">ok_flights</span> <span class="o">&lt;-</span> <span class="n">temp</span> <span class="o">%&gt;%</span> <span class="n">filter</span><span class="p">(</span><span class="n">arr_delay</span><span class="o">&lt;=</span><span class="m">2</span><span class="p">,</span> <span class="n">dep_delay</span><span class="o">&lt;=</span><span class="m">2</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r">ok_flights <span class="o">&lt;-</span> temp <span class="o">%&gt;%</span> filter<span class="p">(</span>arr_delay<span class="o">&lt;=</span><span class="m">2</span><span class="p">,</span> dep_delay<span class="o">&lt;=</span><span class="m">2</span><span class="p">)</span></code></pre></figure>
 
-<p>Moreover, you may have notice we used something new (<code class="highlighter-rouge">%&gt;%</code>). This symbol tells us that we are using what’s on the left of it as the first parameter for the expression on the right, and is thus equivalent to:</p>
+<p>Moreover, you may have notice we used something new (<code>%&gt;%</code>). This symbol tells us that we are using what’s on the left of it as the first parameter for the expression on the right, and is thus equivalent to:</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">ok_flights</span> <span class="o">&lt;-</span> <span class="n">filter</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">arr_delay</span><span class="o">&lt;=</span><span class="m">2</span><span class="p">,</span> <span class="n">dep_delay</span><span class="o">&lt;=</span><span class="m">2</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r">ok_flights <span class="o">&lt;-</span> filter<span class="p">(</span>temp<span class="p">,</span> arr_delay<span class="o">&lt;=</span><span class="m">2</span><span class="p">,</span> dep_delay<span class="o">&lt;=</span><span class="m">2</span><span class="p">)</span></code></pre></figure>
 
-<p>Now with this data set, we could ask: <code class="highlighter-rouge">Which airlines have the most "acceptable" delays(including flights ahead of schedule)?</code>.</p>
+<p>Now with this data set, we could ask: <code>Which airlines have the most "acceptable" delays(including flights ahead of schedule)?</code>.</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">ok_flights</span> <span class="o">%&gt;%</span>
-<span class="n">group_by</span><span class="p">(</span><span class="n">carrier</span><span class="p">)</span> <span class="o">%&gt;%</span>
-<span class="n">summarise</span><span class="p">(</span><span class="n">num_tot_delay</span> <span class="o">=</span> <span class="n">n</span><span class="p">())</span> <span class="o">%&gt;%</span>
-<span class="n">arrange</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">num_tot_delay</span><span class="p">))</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r">ok_flights <span class="o">%&gt;%</span>
+group_by<span class="p">(</span>carrier<span class="p">)</span> <span class="o">%&gt;%</span>
+summarise<span class="p">(</span>num_tot_delay <span class="o">=</span> n<span class="p">())</span> <span class="o">%&gt;%</span>
+arrange<span class="p">(</span>desc<span class="p">(</span>num_tot_delay<span class="p">))</span></code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-text" data-lang="text">## Source: local data frame [16 x 2]
 ## 
@@ -170,14 +174,14 @@ Perhaps we can create a variable that will give us the total delay of the flight
 ## 15      F9           224
 ## 16      OO            18</code></pre></figure>
 
-<p>In this example we made use of multiple pipes. Moreover, we introduced the <code class="highlighter-rouge">group_by()</code> function, which was used to the dataframe into subsets based on the carrier. We then looked at the average total delay for all the flights for each different airline using the <code class="highlighter-rouge">summarise()</code> function. Lastly, we used the <code class="highlighter-rouge">arrange()</code> function in order to look at the flights with the most “acceptable” delays. In fact we do see UA and DELTA which are probably handle the most traffic, and thus this analysis might not actually tell us much about the quality of their services.</p>
+<p>In this example we made use of multiple pipes. Moreover, we introduced the <code>group_by()</code> function, which was used to the dataframe into subsets based on the carrier. We then looked at the average total delay for all the flights for each different airline using the <code>summarise()</code> function. Lastly, we used the <code>arrange()</code> function in order to look at the flights with the most “acceptable” delays. In fact we do see UA and DELTA which are probably handle the most traffic, and thus this analysis might not actually tell us much about the quality of their services.</p>
 
-<p>If we were to use <code class="highlighter-rouge">ok_flights</code>, a more appropriate question would be to see which carrier had the shortest delays on average, given that they were acceptable flights.</p>
+<p>If we were to use <code>ok_flights</code>, a more appropriate question would be to see which carrier had the shortest delays on average, given that they were acceptable flights.</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">ok_flights</span> <span class="o">%&gt;%</span>
-<span class="n">group_by</span><span class="p">(</span><span class="n">carrier</span><span class="p">)</span> <span class="o">%&gt;%</span>
-<span class="n">summarise</span><span class="p">(</span><span class="n">mean_tot_delay</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">total_delay</span><span class="p">))</span> <span class="o">%&gt;%</span>
-<span class="n">arrange</span><span class="p">(</span><span class="n">mean_tot_delay</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r">ok_flights <span class="o">%&gt;%</span>
+group_by<span class="p">(</span>carrier<span class="p">)</span> <span class="o">%&gt;%</span>
+summarise<span class="p">(</span>mean_tot_delay <span class="o">=</span> <span class="kp">mean</span><span class="p">(</span>total_delay<span class="p">))</span> <span class="o">%&gt;%</span>
+arrange<span class="p">(</span>mean_tot_delay<span class="p">)</span></code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-text" data-lang="text">## Source: local data frame [16 x 2]
 ## 
@@ -202,11 +206,11 @@ Perhaps we can create a variable that will give us the total delay of the flight
 
 <p>One last thing we could do is to look at the previous bar graph, and create one that symbolizes what proportion of flights were acceptable in a visual manner, although we can see this from the original, let’s just make use of some cool settings in ggplot.</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#first we need to create a new variable that indicates whether a flight was
-#indeed an acceptable flight
-</span><span class="n">temp2</span> <span class="o">&lt;-</span> <span class="n">mutate</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">acceptable</span> <span class="o">=</span> <span class="p">(</span><span class="n">arr_delay</span><span class="o">&lt;=</span><span class="m">2</span> <span class="o">&amp;</span> <span class="n">dep_delay</span><span class="o">&lt;=</span><span class="m">2</span><span class="p">))</span>
-<span class="n">g2</span><span class="o">&lt;-</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">temp2</span><span class="p">)</span>
-<span class="n">g2</span> <span class="o">+</span> <span class="n">geom_bar</span><span class="p">(</span><span class="n">mapping</span><span class="o">=</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">total_delay</span><span class="p">,</span><span class="n">fill</span><span class="o">=</span><span class="n">acceptable</span><span class="p">))</span> <span class="o">+</span> <span class="n">xlim</span><span class="p">(</span><span class="m">-100</span><span class="p">,</span><span class="m">1000</span><span class="p">)</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"A look at the distribution of delays"</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#first we need to create a new variable that indicates whether a flight was</span>
+<span class="c1">#indeed an acceptable flight</span>
+temp2 <span class="o">&lt;-</span> mutate<span class="p">(</span>temp<span class="p">,</span> acceptable <span class="o">=</span> <span class="p">(</span>arr_delay<span class="o">&lt;=</span><span class="m">2</span> <span class="o">&amp;</span> dep_delay<span class="o">&lt;=</span><span class="m">2</span><span class="p">))</span>
+g2<span class="o">&lt;-</span>ggplot<span class="p">(</span>data<span class="o">=</span>temp2<span class="p">)</span>
+g2 <span class="o">+</span> geom_bar<span class="p">(</span>mapping<span class="o">=</span>aes<span class="p">(</span>x<span class="o">=</span>total_delay<span class="p">,</span>fill<span class="o">=</span>acceptable<span class="p">))</span> <span class="o">+</span> xlim<span class="p">(</span><span class="m">-100</span><span class="p">,</span><span class="m">1000</span><span class="p">)</span> <span class="o">+</span> labs<span class="p">(</span>title<span class="o">=</span><span class="s">&quot;A look at the distribution of delays&quot;</span><span class="p">)</span></code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-text" data-lang="text">## Warning: Removed 9482 rows containing non-finite values (stat_count).</code></pre></figure>
 
