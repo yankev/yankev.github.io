@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "FUCK"
+title:  "testing"
 date:   2016-01-12 10:46:55 -0500
 ---
 
