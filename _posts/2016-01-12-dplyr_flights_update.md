@@ -190,6 +190,26 @@ arrange(mean_tot_delay)
 ## 16      FL      -15.52893
 {% endhighlight %}
 
+One last thing we could do is to look at the previous bar graph, and create one that symbolizes what proportion of flights were acceptable in a visual manner, although we can see this from the original, let's just make use of some cool settings in ggplot.
+
+
+{% highlight r %}
+#first we need to create a new variable that indicates whether a flight was
+#indeed an acceptable flight
+temp2 <- mutate(temp, acceptable = (arr_delay<=2 & dep_delay<=2))
+g2<-ggplot(data=temp2)
+g2 + geom_bar(mapping=aes(x=total_delay,fill=acceptable)) + xlim(-100,1000) + labs(title="A look at the distribution of delays")
+{% endhighlight %}
+
+
+{% highlight text %}
+## Warning: Removed 9482 rows containing non-finite values (stat_count).
+{% endhighlight %}
+
+![center](http://yankev.github.io/figs/dplyr_flights/unnamed-chunk-9-1.png)
+
+**Woah**, this is kind of weird, there are some un-acceptable flights with total delays less than 0. But remember the conditions for an acceptable flight were no arrival or departure delays longer than 2 hours; However some of these flights indicate cases where for example, dep_delay = 5, but arr_delay=-10. **phew!**.
+However, now the question is whether our conditions for acceptability are valid, because of their inconsistency with total_delay, but that's a question we'll leave for the moment.
 
 #### In closing
 
