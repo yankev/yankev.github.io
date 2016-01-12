@@ -95,7 +95,8 @@ code {
   font-size: 15px;
   border: 1px solid #e8e8e8;
   border-radius: 3px;
-  background-color: #eef; }
+  /*background-color: #eef;*/
+  background-color: #D1DCE2; }
 
 code {
   padding: 1px 5px; }
@@ -151,7 +152,7 @@ pre {
   border-top: 1px solid #424242;
   border-bottom: 1px solid #e8e8e8;
   min-height: 60px;
-  background-image: url("http://127.0.0.1:4000/images/background.jpg");
+  background-image: url("/images/background.jpg");
   position: relative; }
 
 .site-title {
