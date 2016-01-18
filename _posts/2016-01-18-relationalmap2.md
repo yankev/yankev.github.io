@@ -135,8 +135,8 @@ usa
 {% endhighlight %}
 
 <div>
-    <a href="https://plot.ly/~yankev/1/" target="_blank" title="Most trafficked US airports&lt;br&gt;(Hover for airport)" style="display: block; text-align: center;"><img src="https://plot.ly/~yankev/1.png" alt="Most trafficked US airports&lt;br&gt;(Hover for airport)" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-    <script data-plotly="yankev:1"  src="https://plot.ly/embed.js" async></script>
+    <a href="https://plot.ly/~yankev/3/" target="_blank" title="Delays of US airports, flying out of NYC" style="display: block; text-align: center;"><img src="https://plot.ly/~yankev/3.png" alt="Delays of US airports, flying out of NYC" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="yankev:3"  src="https://plot.ly/embed.js" async></script>
 </div>
 
 
