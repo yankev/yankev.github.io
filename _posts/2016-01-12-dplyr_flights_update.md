@@ -1,11 +1,11 @@
 ---
 layout: post
-title:  "Intro to Dplyr on nycflights13 (Updated)"
+title:  "Intro to Dplyr on nycflights13 (Updated Jan 18)"
 date:   2016-01-12 10:46:55 -0500
 ---
 
 ### Introduction
-In this entry I'm going to work through a sequence of analysis that will cover some of the main operations in dplyr. Dplyr is a tool in R that will frame our data into a data-structure called a dataframe(different than the standard on in R). It will allow us to query the dataframe similar to what is possible in SQL.
+In this entry I'm going to work through a sequence of analysis that will cover some of the main operations in dplyr. Dplyr is a tool in R that simplifies, and thus standardizes functions that you would generally perform on dataframes using base R functons. It will allow us to query the dataframe similar to what is possible in SQL.
   
 > The main operations in dplyr are:  
 >
@@ -215,3 +215,5 @@ However, now the question is whether our conditions for acceptability are valid,
 
 We took a brief look at the operations included in the dplyr package, and how simple it was for us to do some initial exploratory analysis on the data set. 
 
+
+##### Corrections: Redefined the dplyr package in the Intro.
