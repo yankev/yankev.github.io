@@ -4,10 +4,10 @@
     <title>Kevin&#39;s blog</title>
     <description>Hi, this is a blog that documents some of the cool things that I have learned and would like to document for myself, as well as share with others.
 </description>
-    <link>127.0.0.1:4000/</link>
-    <atom:link href="127.0.0.1:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 21 Jan 2016 18:30:30 -0500</pubDate>
-    <lastBuildDate>Thu, 21 Jan 2016 18:30:30 -0500</lastBuildDate>
+    <link>127.0.0.1:4000http://yankev.github.io/</link>
+    <atom:link href="127.0.0.1:4000http://yankev.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 21 Jan 2016 18:40:09 -0500</pubDate>
+    <lastBuildDate>Thu, 21 Jan 2016 18:40:09 -0500</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
     
       <item>
@@ -203,8 +203,8 @@ g_planes &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; geom_jitter&lt;span clas
 
 </description>
         <pubDate>Mon, 18 Jan 2016 18:46:00 -0500</pubDate>
-        <link>127.0.0.1:4000/2016/01/18/relationalmap2.html</link>
-        <guid isPermaLink="true">127.0.0.1:4000/2016/01/18/relationalmap2.html</guid>
+        <link>127.0.0.1:4000http://yankev.github.io/2016/01/18/relationalmap2.html</link>
+        <guid isPermaLink="true">127.0.0.1:4000http://yankev.github.io/2016/01/18/relationalmap2.html</guid>
         
         
       </item>
@@ -1002,8 +1002,8 @@ div#notebook {
 
 </description>
         <pubDate>Tue, 12 Jan 2016 10:46:55 -0500</pubDate>
-        <link>127.0.0.1:4000/2016/01/12/python_scrape_team_salary.html</link>
-        <guid isPermaLink="true">127.0.0.1:4000/2016/01/12/python_scrape_team_salary.html</guid>
+        <link>127.0.0.1:4000http://yankev.github.io/2016/01/12/python_scrape_team_salary.html</link>
+        <guid isPermaLink="true">127.0.0.1:4000http://yankev.github.io/2016/01/12/python_scrape_team_salary.html</guid>
         
         
       </item>
@@ -1177,8 +1177,8 @@ However, now the question is whether our conditions for acceptability are valid,
 &lt;h5 id=&quot;corrections-redefined-the-dplyr-package-in-the-intro&quot;&gt;Corrections: Redefined the dplyr package in the Intro.&lt;/h5&gt;
 </description>
         <pubDate>Tue, 12 Jan 2016 10:46:55 -0500</pubDate>
-        <link>127.0.0.1:4000/2016/01/12/dplyr_flights_update.html</link>
-        <guid isPermaLink="true">127.0.0.1:4000/2016/01/12/dplyr_flights_update.html</guid>
+        <link>127.0.0.1:4000http://yankev.github.io/2016/01/12/dplyr_flights_update.html</link>
+        <guid isPermaLink="true">127.0.0.1:4000http://yankev.github.io/2016/01/12/dplyr_flights_update.html</guid>
         
         
       </item>
