@@ -1,0 +1,21 @@
+---
+layout: default
+title: Other
+---
+
+<div class="home">
+
+  <h1 class="page-heading">Here is some other work:</h1>
+
+  <ul class="post-list">
+    {% for post in site.otherwork %}
+      <li>
+
+        <h2>
+          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        </h2>
+      </li>
+    {% endfor %}
+  </ul>
+
+</div>

@@ -6,9 +6,208 @@
 </description>
     <link>127.0.0.1:4000/</link>
     <atom:link href="127.0.0.1:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 12 Jan 2016 15:49:23 -0500</pubDate>
-    <lastBuildDate>Tue, 12 Jan 2016 15:49:23 -0500</lastBuildDate>
+    <pubDate>Thu, 21 Jan 2016 18:26:15 -0500</pubDate>
+    <lastBuildDate>Thu, 21 Jan 2016 18:26:15 -0500</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
+    
+      <item>
+        <title>Analysing nycflights13 Using Relational Structure of its DataFrames (Updated) </title>
+        <description>&lt;h3 id=&quot;introduction&quot;&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;In this post we’ll be usig the &lt;code&gt;nycflights13&lt;/code&gt; data again, and this is because it has many other dataframes within it, so that we can use some of dplyr’s relational function.&lt;/p&gt;
+
+&lt;p&gt;In fact there are the following datasets within this package:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;code&gt;flights&lt;/code&gt; which contains information about all the flights out of New York, and is the most central df&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;airports&lt;/code&gt; which gives us information regarding the airports, ie:the name and location&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;planes&lt;/code&gt; which gives us information regarding particular planes, used in &lt;code&gt;flights&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;airlines&lt;/code&gt; gives information regarding airlines&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;weather&lt;/code&gt; which gives us the weather conditions at the departing city/aiport in New York.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;In this post we’ll take a look at &lt;code&gt;flights, planes, and airports&lt;/code&gt; in the following 2 questions.&lt;/p&gt;
+
+&lt;h4 id=&quot;lets-begin&quot;&gt;Let’s begin&lt;/h4&gt;
+
+&lt;p&gt;So the first question we’ll take a look at is:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Compute the average delay by destination, then join on the airports data frame so you can show the spatial distribution of delays.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;flights2 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; mutate&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; tot_delay &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; arr_delay &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; dep_delay&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+flights2 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; flights2 &lt;span class=&quot;o&quot;&gt;%&amp;gt;%&lt;/span&gt; group_by&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;dest&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&amp;gt;%&lt;/span&gt; 
+  summarise&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;avg_delay &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;tot_delay&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; na.rm &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&amp;gt;%&lt;/span&gt; 
+  left_join&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;airports&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;dest&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;faa&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&amp;gt;%&lt;/span&gt;
+  arrange&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;desc&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;avg_delay&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+&lt;span class=&quot;kp&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights2&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## Source: local data frame [6 x 8]
+## 
+##    dest avg_delay                  name      lat        lon   alt    tz
+##   (chr)     (dbl)                 (chr)    (dbl)      (dbl) (int) (dbl)
+## 1   CAE  75.57547 Columbia Metropolitan 33.93883  -81.11953   236    -5
+## 2   TUL  68.54762            Tulsa Intl 36.19839  -95.88811   677    -6
+## 3   OKC  59.80000     Will Rogers World 35.39309  -97.60073  1295    -6
+## 4   JAC  55.57143  Jackson Hole Airport 43.60733 -110.73775  6451    -7
+## 5   TYS  52.45156         Mc Ghee Tyson 35.81097  -83.99403   981    -5
+## 6   BHM  45.89219       Birmingham Intl 33.56294  -86.75355   644    -6
+## Variables not shown: dst (chr)&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Now we’re ready to visualize this information. First let’s make a plot of the United States, as it seems the flights only include flights to other American cities. We use the map data included with the &lt;code&gt;ggplot2&lt;/code&gt; package, and we we set the variable &lt;code&gt;states&lt;/code&gt; to the dataframe that includes the coordinates to plot each state.
+We then use &lt;code&gt;geom_polygon&lt;/code&gt; in order to plot the map using the coordinate information.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;kn&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;ggplot2&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+states &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; map_data&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;state&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+g &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ggplot&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;data&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;states&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+g2 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; g &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; geom_polygon&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;mapping&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;aes&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;x&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;long&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;y&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;lat&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;group&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;group&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;color&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;white&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;fill&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;grey&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+g2 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; g2 &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; ggtitle&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Map of the USA minus Alaska&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+g2&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://yankev.github.io/figs/relationalmap_plotly/unnamed-chunk-3-1.png&quot; alt=&quot;center&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s now add the information regarding which destination airports are the cause of most delay. Let’s remove the points that are too west to be plotted onto this map, (ie: all airports in Alaska).&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;flights3 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; filter&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights2&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; lon &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;-140&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+g3 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; g2 &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; geom_point&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;data&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;flights3&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; mapping &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; aes&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;x &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; lon&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; y &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; lat&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; color &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; avg_delay&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; 
+                position &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;jitter&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;size&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; labs&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;color &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Average Delay&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;
+                scale_colour_gradient&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;low &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;white&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;high &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;dark red&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+g3&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://yankev.github.io/figs/relationalmap_plotly/unnamed-chunk-4-1.png&quot; alt=&quot;center&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s make this even more detailed by adding some labels to the worst, and best destinations.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#let&amp;#39;s remove the na terms, because they will cause some trouble for the tail function later on.&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#note: probably should&amp;#39;ve removed the na terms far earlier on.&lt;/span&gt;
+
+flights3 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; filter&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights3&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;is.na&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;avg_delay&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+worst_flights &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights3&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+best_flights &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;tail&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights3&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+g4 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; g3 &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; geom_text&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;data&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;worst_flights&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; mapping&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;aes&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;x &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; lon&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; y &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; lat&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; label &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; dest&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; color&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;red&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; nudge_y &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;-0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
+
+g4 &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; geom_text&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;data&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;best_flights&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; mapping&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;aes&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;x &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; lon&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; y &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; lat &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; label &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; dest&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; angle&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;nudge_y&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;-0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://yankev.github.io/figs/relationalmap_plotly/unnamed-chunk-5-1.png&quot; alt=&quot;center&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;as-an-added-bonus-well-plot-this-informationincluding-those-points-too-western-for-the-ggplot-map-of-the-usa-using-plotly&quot;&gt;As an added bonus, we’ll plot this information(including those points too Western for the ggplot map of the USA) using &lt;code&gt;plotly&lt;/code&gt;.&lt;/h4&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;flights2&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;hover &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;with&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights2&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;paste0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;name&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;, Avg. Delay: &amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;avg_delay&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+m &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+  colorbar &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;title &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Average Delay&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+  size &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; opacity &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; symbol &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;circle&amp;#39;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# geo styling&lt;/span&gt;
+g &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+  scope &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;usa&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  projection &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;type &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;albers usa&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+  showland &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;TRUE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  landcolor &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; toRGB&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;gray95&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+  subunitcolor &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; toRGB&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;gray85&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+  countrycolor &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; toRGB&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;gray85&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+  countrywidth &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  subunitwidth &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0.5&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+
+
+usa &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; plot_ly&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights2&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; lat &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; lat&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; lon &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; lon&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; text &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; hover&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; color &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; avg_delay&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        type &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;scattergeo&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; locationmode &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;USA-states&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; mode &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;markers&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        marker &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; m&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&amp;gt;%&lt;/span&gt; layout&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;title &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Delays of US airports, flying out of NYC&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; geo &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; g&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+usa&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;div&gt;
+    &lt;a href=&quot;https://plot.ly/~yankev/3/&quot; target=&quot;_blank&quot; title=&quot;Delays of US airports, flying out of NYC&quot; style=&quot;display: block; text-align: center;&quot;&gt;&lt;img src=&quot;https://plot.ly/~yankev/3.png&quot; alt=&quot;Delays of US airports, flying out of NYC&quot; style=&quot;max-width: 100%;width: 600px;&quot; width=&quot;600&quot; onerror=&quot;this.onerror=null;this.src=&#39;https://plot.ly/404.png&#39;;&quot; /&gt;&lt;/a&gt;
+    &lt;script data-plotly=&quot;yankev:3&quot; src=&quot;https://plot.ly/embed.js&quot; async=&quot;&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;second-question-now-is&quot;&gt;Second Question now is:&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Is there a relationship between the age of a plane and its delays?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;So for this we are using the year the plane is made as a proxy for age, ie: latest models are the youngest planes.
+Answering this question now requires us to join the &lt;code&gt;planes&lt;/code&gt; table with the flights table in a similar fashion as we did before:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;flights_planes &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; mutate&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; tot_delay &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; arr_delay &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; dep_delay&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+flights_planes &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; flights_planes &lt;span class=&quot;o&quot;&gt;%&amp;gt;%&lt;/span&gt; group_by&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;tailnum&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&amp;gt;%&lt;/span&gt; 
+  summarise&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;avg_delay &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;tot_delay&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; na.rm &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; num_of_flights &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; n&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&amp;gt;%&lt;/span&gt; 
+  left_join&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;planes&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; by&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;tailnum&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&amp;gt;%&lt;/span&gt;
+  arrange&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;desc&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;avg_delay&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+&lt;span class=&quot;kp&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights_planes&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## Source: local data frame [6 x 11]
+## 
+##   tailnum avg_delay num_of_flights  year                    type
+##     (chr)     (dbl)          (int) (int)                   (chr)
+## 1  N844MH       617              1  2002 Fixed wing multi engine
+## 2  N911DA       562              1  1995 Fixed wing multi engine
+## 3  N922EV       550              1  2003 Fixed wing multi engine
+## 4  N587NW       536              1  2002 Fixed wing multi engine
+## 5  N851NW       452              1  2004 Fixed wing multi engine
+## 6  N654UA       412              1  1992 Fixed wing multi engine
+## Variables not shown: manufacturer (chr), model (chr), engines (int), seats
+##   (int), speed (int), engine (chr)&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#let&amp;#39;s remove all the planes that haven&amp;#39;t flown more than 100 times, and any missing values.&lt;/span&gt;
+
+flights_planes2 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; filter&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;flights_planes&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; num_of_flights&lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;is.na&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;avg_delay&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;is.na&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;year&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+g_planes &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ggplot&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+g_planes &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; geom_jitter&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;data&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;flights_planes2&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; mapping &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; aes&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;x&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;year&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;y&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;avg_delay&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; geom_smooth&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;data&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;flights_planes2&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; mapping &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; aes&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;x&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;year&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; y&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;avg_delay&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; method &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;lm&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; xlab&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Year&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; ylab&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Average Delay&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; ggtitle&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Year of Plane vs Average Delay&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; geom_smooth&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;data&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;flights_planes2&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; mapping&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;aes&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;x&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;year&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;y&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;avg_delay&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; color&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;red&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; se&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://yankev.github.io/figs/relationalmap_plotly/unnamed-chunk-8-1.png&quot; alt=&quot;center&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;From the looks of the plot, it doesn’t really seem like there’s a relationship. The average delay times are all fairly spread out for all the years with a lot of planes, there does seem to be a lot more variation in the early 2000s compared to the years following however.&lt;/p&gt;
+
+&lt;p&gt;However I plotted the blue line, which represents a linear model (avg_delay ~ year), and it seems to signal a positive relationship between the two variables. We can further examine the model to see if this is valid.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;model &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; lm&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;avg_delay&lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;year&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;data&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;flights_planes2&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kp&quot;&gt;summary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;model&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## 
+## Call:
+## lm(formula = avg_delay ~ year, data = flights_planes2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -29.065  -9.303  -1.536   7.916  42.411 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&amp;gt;|t|)  
+## (Intercept) -318.72454  139.19931  -2.290   0.0222 *
+## year           0.16929    0.06954   2.434   0.0151 *
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 12.73 on 1097 degrees of freedom
+## Multiple R-squared:  0.005373,	Adjusted R-squared:  0.004466 
+## F-statistic: 5.926 on 1 and 1097 DF,  p-value: 0.01508&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;We see that the p-value for the coefficient for year is actually significant, and is equal to &lt;code&gt;0.16929&lt;/code&gt;, which is again quite negligile in practical terms. In addition, the r-squared of the model is: &lt;code&gt;summary(model)$r.squared&lt;/code&gt; which indicates an extremely poor model, and thus it’s evidence against a linear relationship between year of the plane and average delay. In addition we also tried a polynomial model(indicated in red), but that returned a poor r-squared as well. Thus I don’t believe that there’s a practical relationship between the age of the plane the delays they face, at least for the data that is present in the nycflights13 dataset.&lt;/p&gt;
+
+&lt;h4 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h4&gt;
+
+&lt;p&gt;In this post we used &lt;code&gt;join functions&lt;/code&gt; in the &lt;code&gt;dplyr&lt;/code&gt; package in order to generate new data frames for our analysis. We were able to use this information to visualize delays by airports via a map of the USA, and we were able to answer the question of whether or not the age of the plane had an influence of the average delay time of the plane.&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 18 Jan 2016 18:46:00 -0500</pubDate>
+        <link>127.0.0.1:4000/2016/01/18/relationalmap2.html</link>
+        <guid isPermaLink="true">127.0.0.1:4000/2016/01/18/relationalmap2.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Using BS4 and Pandas to retrieve salaries from BasketballReference</title>
@@ -810,9 +1009,9 @@ div#notebook {
       </item>
     
       <item>
-        <title>Intro to Dplyr on nycflights13 (Updated)</title>
+        <title>Intro to Dplyr on nycflights13 (Updated Jan 18)</title>
         <description>&lt;h3 id=&quot;introduction&quot;&gt;Introduction&lt;/h3&gt;
-&lt;p&gt;In this entry I’m going to work through a sequence of analysis that will cover some of the main operations in dplyr. Dplyr is a tool in R that will frame our data into a data-structure called a dataframe(different than the standard on in R). It will allow us to query the dataframe similar to what is possible in SQL.&lt;/p&gt;
+&lt;p&gt;In this entry I’m going to work through a sequence of analysis that will cover some of the main operations in dplyr. Dplyr is a tool in R that simplifies, and thus standardizes functions that you would generally perform on dataframes using base R functons. It will allow us to query the dataframe similar to what is possible in SQL.&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;The main operations in dplyr are:&lt;/p&gt;
@@ -975,27 +1174,11 @@ However, now the question is whether our conditions for acceptability are valid,
 
 &lt;p&gt;We took a brief look at the operations included in the dplyr package, and how simple it was for us to do some initial exploratory analysis on the data set.&lt;/p&gt;
 
+&lt;h5 id=&quot;corrections-redefined-the-dplyr-package-in-the-intro&quot;&gt;Corrections: Redefined the dplyr package in the Intro.&lt;/h5&gt;
 </description>
         <pubDate>Tue, 12 Jan 2016 10:46:55 -0500</pubDate>
         <link>127.0.0.1:4000/2016/01/12/dplyr_flights_update.html</link>
         <guid isPermaLink="true">127.0.0.1:4000/2016/01/12/dplyr_flights_update.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>testing</title>
-        <description>&lt;pre&gt;&lt;code&gt;import something
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;hello&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;something&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;FINALLY&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-</description>
-        <pubDate>Mon, 11 Jan 2016 10:46:55 -0500</pubDate>
-        <link>127.0.0.1:4000/2016/01/11/markdowntest.html</link>
-        <guid isPermaLink="true">127.0.0.1:4000/2016/01/11/markdowntest.html</guid>
         
         
       </item>

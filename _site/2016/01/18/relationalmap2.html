@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Analysing nycflights13 Using Relational Structure of its DataFrames (Updated) </title>
+  <meta name="description" content="IntroductionIn this post we’ll be usig the nycflights13 data again, and this is because it has many other dataframes within it, so that we can use some of dp...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="127.0.0.1:4000/2016/01/18/relationalmap2.html">
+  <link rel="alternate" type="application/rss+xml" title="Kevin's blog" href="127.0.0.1:4000/feed.xml">
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-72352404-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+  
+  <div class="wrapper">
+    <a class="site-title" href="/">Kevin's blog</a>
+
+    <nav class="site-nav">
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="/otherwork.html">Other</a>
+          
+        
+          
+          <a class="page-link" href="/todo/">To do</a>
+          
+        
+        <img src="/images/logo.jpg", height="56px">
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Analysing nycflights13 Using Relational Structure of its DataFrames (Updated) </h1>
+    <p class="post-meta"><time datetime="2016-01-18T18:46:00-05:00" itemprop="datePublished">Jan 18, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="introduction">Introduction</h3>
+<p>In this post we’ll be usig the <code>nycflights13</code> data again, and this is because it has many other dataframes within it, so that we can use some of dplyr’s relational function.</p>
+
+<p>In fact there are the following datasets within this package:</p>
+
+<ol>
+  <li>
+    <p><code>flights</code> which contains information about all the flights out of New York, and is the most central df</p>
+  </li>
+  <li><code>airports</code> which gives us information regarding the airports, ie:the name and location</li>
+  <li><code>planes</code> which gives us information regarding particular planes, used in <code>flights</code></li>
+  <li><code>airlines</code> gives information regarding airlines</li>
+  <li><code>weather</code> which gives us the weather conditions at the departing city/aiport in New York.</li>
+</ol>
+
+<p>In this post we’ll take a look at <code>flights, planes, and airports</code> in the following 2 questions.</p>
+
+<h4 id="lets-begin">Let’s begin</h4>
+
+<p>So the first question we’ll take a look at is:</p>
+
+<ul>
+  <li>Compute the average delay by destination, then join on the airports data frame so you can show the spatial distribution of delays.</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r">flights2 <span class="o">&lt;-</span> mutate<span class="p">(</span>flights<span class="p">,</span> tot_delay <span class="o">=</span> arr_delay <span class="o">+</span> dep_delay<span class="p">)</span>
+flights2 <span class="o">&lt;-</span> flights2 <span class="o">%&gt;%</span> group_by<span class="p">(</span>dest<span class="p">)</span> <span class="o">%&gt;%</span> 
+  summarise<span class="p">(</span>avg_delay <span class="o">=</span> <span class="kp">mean</span><span class="p">(</span>tot_delay<span class="p">,</span> na.rm <span class="o">=</span> <span class="bp">T</span><span class="p">))</span> <span class="o">%&gt;%</span> 
+  left_join<span class="p">(</span>airports<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;dest&quot;</span><span class="o">=</span><span class="s">&quot;faa&quot;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  arrange<span class="p">(</span>desc<span class="p">(</span>avg_delay<span class="p">))</span>
+
+<span class="kp">head</span><span class="p">(</span>flights2<span class="p">)</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">## Source: local data frame [6 x 8]
+## 
+##    dest avg_delay                  name      lat        lon   alt    tz
+##   (chr)     (dbl)                 (chr)    (dbl)      (dbl) (int) (dbl)
+## 1   CAE  75.57547 Columbia Metropolitan 33.93883  -81.11953   236    -5
+## 2   TUL  68.54762            Tulsa Intl 36.19839  -95.88811   677    -6
+## 3   OKC  59.80000     Will Rogers World 35.39309  -97.60073  1295    -6
+## 4   JAC  55.57143  Jackson Hole Airport 43.60733 -110.73775  6451    -7
+## 5   TYS  52.45156         Mc Ghee Tyson 35.81097  -83.99403   981    -5
+## 6   BHM  45.89219       Birmingham Intl 33.56294  -86.75355   644    -6
+## Variables not shown: dst (chr)</code></pre></figure>
+
+<p>Now we’re ready to visualize this information. First let’s make a plot of the United States, as it seems the flights only include flights to other American cities. We use the map data included with the <code>ggplot2</code> package, and we we set the variable <code>states</code> to the dataframe that includes the coordinates to plot each state.
+We then use <code>geom_polygon</code> in order to plot the map using the coordinate information.</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+states <span class="o">=</span> map_data<span class="p">(</span><span class="s">&quot;state&quot;</span><span class="p">)</span>
+
+g <span class="o">&lt;-</span> ggplot<span class="p">(</span>data<span class="o">=</span>states<span class="p">)</span>
+g2 <span class="o">&lt;-</span> g <span class="o">+</span> geom_polygon<span class="p">(</span>mapping<span class="o">=</span>aes<span class="p">(</span>x<span class="o">=</span>long<span class="p">,</span>y<span class="o">=</span>lat<span class="p">,</span>group<span class="o">=</span>group<span class="p">),</span>color<span class="o">=</span><span class="s">&quot;white&quot;</span><span class="p">,</span>fill<span class="o">=</span><span class="s">&quot;grey&quot;</span><span class="p">)</span>
+g2 <span class="o">&lt;-</span> g2 <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;Map of the USA minus Alaska&quot;</span><span class="p">)</span>
+g2</code></pre></figure>
+
+<p><img src="http://yankev.github.io/figs/relationalmap_plotly/unnamed-chunk-3-1.png" alt="center" /></p>
+
+<p>Let’s now add the information regarding which destination airports are the cause of most delay. Let’s remove the points that are too west to be plotted onto this map, (ie: all airports in Alaska).</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r">flights3 <span class="o">&lt;-</span> filter<span class="p">(</span>flights2<span class="p">,</span> lon <span class="o">&gt;</span> <span class="m">-140</span><span class="p">)</span>
+g3 <span class="o">&lt;-</span> g2 <span class="o">+</span> geom_point<span class="p">(</span>data<span class="o">=</span>flights3<span class="p">,</span> mapping <span class="o">=</span> aes<span class="p">(</span>x <span class="o">=</span> lon<span class="p">,</span> y <span class="o">=</span> lat<span class="p">,</span> color <span class="o">=</span> avg_delay<span class="p">),</span> 
+                position <span class="o">=</span> <span class="s">&quot;jitter&quot;</span><span class="p">,</span>size<span class="o">=</span><span class="m">2.5</span><span class="p">)</span> <span class="o">+</span> labs<span class="p">(</span>color <span class="o">=</span> <span class="s">&quot;Average Delay&quot;</span><span class="p">)</span> <span class="o">+</span>
+                scale_colour_gradient<span class="p">(</span>low <span class="o">=</span> <span class="s">&quot;white&quot;</span><span class="p">,</span>high <span class="o">=</span> <span class="s">&quot;dark red&quot;</span><span class="p">)</span>
+g3</code></pre></figure>
+
+<p><img src="http://yankev.github.io/figs/relationalmap_plotly/unnamed-chunk-4-1.png" alt="center" /></p>
+
+<p>Let’s make this even more detailed by adding some labels to the worst, and best destinations.</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#let&#39;s remove the na terms, because they will cause some trouble for the tail function later on.</span>
+<span class="c1">#note: probably should&#39;ve removed the na terms far earlier on.</span>
+
+flights3 <span class="o">&lt;-</span> filter<span class="p">(</span>flights3<span class="p">,</span> <span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>avg_delay<span class="p">))</span>
+worst_flights <span class="o">&lt;-</span> <span class="kp">head</span><span class="p">(</span>flights3<span class="p">,</span><span class="m">5</span><span class="p">)</span>
+best_flights <span class="o">&lt;-</span> <span class="kp">tail</span><span class="p">(</span>flights3<span class="p">,</span><span class="m">5</span><span class="p">)</span>
+
+g4 <span class="o">&lt;-</span> g3 <span class="o">+</span> geom_text<span class="p">(</span>data<span class="o">=</span>worst_flights<span class="p">,</span> mapping<span class="o">=</span>aes<span class="p">(</span>x <span class="o">=</span> lon<span class="p">,</span> y <span class="o">=</span> lat<span class="p">,</span> label <span class="o">=</span> dest<span class="p">),</span> color<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span> nudge_y <span class="o">=</span> <span class="m">-0.5</span><span class="p">)</span> 
+
+g4 <span class="o">+</span> geom_text<span class="p">(</span>data<span class="o">=</span>best_flights<span class="p">,</span> mapping<span class="o">=</span>aes<span class="p">(</span>x <span class="o">=</span> lon<span class="p">,</span> y <span class="o">=</span> lat <span class="p">,</span> label <span class="o">=</span> dest<span class="p">),</span> angle<span class="o">=</span><span class="m">20</span><span class="p">,</span>nudge_y<span class="o">=</span><span class="m">-0.5</span><span class="p">)</span></code></pre></figure>
+
+<p><img src="http://yankev.github.io/figs/relationalmap_plotly/unnamed-chunk-5-1.png" alt="center" /></p>
+
+<h4 id="as-an-added-bonus-well-plot-this-informationincluding-those-points-too-western-for-the-ggplot-map-of-the-usa-using-plotly">As an added bonus, we’ll plot this information(including those points too Western for the ggplot map of the USA) using <code>plotly</code>.</h4>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r">flights2<span class="o">$</span>hover <span class="o">&lt;-</span> <span class="kp">with</span><span class="p">(</span>flights2<span class="p">,</span> <span class="kp">paste0</span><span class="p">(</span>name<span class="p">,</span><span class="s">&#39;, Avg. Delay: &#39;</span><span class="p">,</span>avg_delay<span class="p">))</span>
+
+m <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span>
+  colorbar <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>title <span class="o">=</span> <span class="s">&quot;Average Delay&quot;</span><span class="p">),</span>
+  size <span class="o">=</span> <span class="m">9</span><span class="p">,</span> opacity <span class="o">=</span> <span class="m">0.7</span><span class="p">,</span> symbol <span class="o">=</span> <span class="s">&#39;circle&#39;</span>
+<span class="p">)</span>
+
+<span class="c1"># geo styling</span>
+g <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span>
+  scope <span class="o">=</span> <span class="s">&#39;usa&#39;</span><span class="p">,</span>
+  projection <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>type <span class="o">=</span> <span class="s">&#39;albers usa&#39;</span><span class="p">),</span>
+  showland <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>
+  landcolor <span class="o">=</span> toRGB<span class="p">(</span><span class="s">&quot;gray95&quot;</span><span class="p">),</span>
+  subunitcolor <span class="o">=</span> toRGB<span class="p">(</span><span class="s">&quot;gray85&quot;</span><span class="p">),</span>
+  countrycolor <span class="o">=</span> toRGB<span class="p">(</span><span class="s">&quot;gray85&quot;</span><span class="p">),</span>
+  countrywidth <span class="o">=</span> <span class="m">1</span><span class="p">,</span>
+  subunitwidth <span class="o">=</span> <span class="m">0.5</span>
+<span class="p">)</span>
+
+
+
+usa <span class="o">&lt;-</span> plot_ly<span class="p">(</span>flights2<span class="p">,</span> lat <span class="o">=</span> lat<span class="p">,</span> lon <span class="o">=</span> lon<span class="p">,</span> text <span class="o">=</span> hover<span class="p">,</span> color <span class="o">=</span> avg_delay<span class="p">,</span>
+        type <span class="o">=</span> <span class="s">&#39;scattergeo&#39;</span><span class="p">,</span> locationmode <span class="o">=</span> <span class="s">&#39;USA-states&#39;</span><span class="p">,</span> mode <span class="o">=</span> <span class="s">&#39;markers&#39;</span><span class="p">,</span>
+        marker <span class="o">=</span> m<span class="p">)</span> <span class="o">%&gt;%</span> layout<span class="p">(</span>title <span class="o">=</span> <span class="s">&#39;Delays of US airports, flying out of NYC&#39;</span><span class="p">,</span> geo <span class="o">=</span> g<span class="p">)</span>
+
+usa</code></pre></figure>
+
+<div>
+    <a href="https://plot.ly/~yankev/3/" target="_blank" title="Delays of US airports, flying out of NYC" style="display: block; text-align: center;"><img src="https://plot.ly/~yankev/3.png" alt="Delays of US airports, flying out of NYC" style="max-width: 100%;width: 600px;" width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="yankev:3" src="https://plot.ly/embed.js" async=""></script>
+</div>
+
+<h4 id="second-question-now-is">Second Question now is:</h4>
+
+<ul>
+  <li>Is there a relationship between the age of a plane and its delays?</li>
+</ul>
+
+<p>So for this we are using the year the plane is made as a proxy for age, ie: latest models are the youngest planes.
+Answering this question now requires us to join the <code>planes</code> table with the flights table in a similar fashion as we did before:</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r">flights_planes <span class="o">&lt;-</span> mutate<span class="p">(</span>flights<span class="p">,</span> tot_delay <span class="o">=</span> arr_delay <span class="o">+</span> dep_delay<span class="p">)</span>
+
+flights_planes <span class="o">&lt;-</span> flights_planes <span class="o">%&gt;%</span> group_by<span class="p">(</span>tailnum<span class="p">)</span> <span class="o">%&gt;%</span> 
+  summarise<span class="p">(</span>avg_delay <span class="o">=</span> <span class="kp">mean</span><span class="p">(</span>tot_delay<span class="p">,</span> na.rm <span class="o">=</span> <span class="bp">T</span><span class="p">),</span> num_of_flights <span class="o">=</span> n<span class="p">()</span> <span class="p">)</span> <span class="o">%&gt;%</span> 
+  left_join<span class="p">(</span>planes<span class="p">,</span> by<span class="o">=</span><span class="s">&quot;tailnum&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  arrange<span class="p">(</span>desc<span class="p">(</span>avg_delay<span class="p">))</span>
+
+<span class="kp">head</span><span class="p">(</span>flights_planes<span class="p">)</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">## Source: local data frame [6 x 11]
+## 
+##   tailnum avg_delay num_of_flights  year                    type
+##     (chr)     (dbl)          (int) (int)                   (chr)
+## 1  N844MH       617              1  2002 Fixed wing multi engine
+## 2  N911DA       562              1  1995 Fixed wing multi engine
+## 3  N922EV       550              1  2003 Fixed wing multi engine
+## 4  N587NW       536              1  2002 Fixed wing multi engine
+## 5  N851NW       452              1  2004 Fixed wing multi engine
+## 6  N654UA       412              1  1992 Fixed wing multi engine
+## Variables not shown: manufacturer (chr), model (chr), engines (int), seats
+##   (int), speed (int), engine (chr)</code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#let&#39;s remove all the planes that haven&#39;t flown more than 100 times, and any missing values.</span>
+
+flights_planes2 <span class="o">&lt;-</span> filter<span class="p">(</span>flights_planes<span class="p">,</span> num_of_flights<span class="o">&gt;=</span><span class="m">100</span><span class="p">,</span> <span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>avg_delay<span class="p">),</span> <span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>year<span class="p">))</span>
+
+g_planes <span class="o">&lt;-</span> ggplot<span class="p">()</span>
+g_planes <span class="o">+</span> geom_jitter<span class="p">(</span>data<span class="o">=</span>flights_planes2<span class="p">,</span> mapping <span class="o">=</span> aes<span class="p">(</span>x<span class="o">=</span>year<span class="p">,</span>y<span class="o">=</span>avg_delay<span class="p">))</span> <span class="o">+</span> geom_smooth<span class="p">(</span>data<span class="o">=</span>flights_planes2<span class="p">,</span> mapping <span class="o">=</span> aes<span class="p">(</span>x<span class="o">=</span>year<span class="p">,</span> y<span class="o">=</span>avg_delay<span class="p">),</span> method <span class="o">=</span> <span class="s">&quot;lm&quot;</span><span class="p">)</span> <span class="o">+</span> xlab<span class="p">(</span><span class="s">&quot;Year&quot;</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">&quot;Average Delay&quot;</span><span class="p">)</span> <span class="o">+</span> ggtitle<span class="p">(</span><span class="s">&quot;Year of Plane vs Average Delay&quot;</span><span class="p">)</span> <span class="o">+</span> geom_smooth<span class="p">(</span>data<span class="o">=</span>flights_planes2<span class="p">,</span> mapping<span class="o">=</span>aes<span class="p">(</span>x<span class="o">=</span>year<span class="p">,</span>y<span class="o">=</span>avg_delay<span class="p">),</span> color<span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span> se<span class="o">=</span><span class="bp">F</span><span class="p">)</span></code></pre></figure>
+
+<p><img src="http://yankev.github.io/figs/relationalmap_plotly/unnamed-chunk-8-1.png" alt="center" /></p>
+
+<p>From the looks of the plot, it doesn’t really seem like there’s a relationship. The average delay times are all fairly spread out for all the years with a lot of planes, there does seem to be a lot more variation in the early 2000s compared to the years following however.</p>
+
+<p>However I plotted the blue line, which represents a linear model (avg_delay ~ year), and it seems to signal a positive relationship between the two variables. We can further examine the model to see if this is valid.</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r">model <span class="o">&lt;-</span> lm<span class="p">(</span>avg_delay<span class="o">~</span>year<span class="p">,</span>data<span class="o">=</span>flights_planes2<span class="p">)</span>
+<span class="kp">summary</span><span class="p">(</span>model<span class="p">)</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">## 
+## Call:
+## lm(formula = avg_delay ~ year, data = flights_planes2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -29.065  -9.303  -1.536   7.916  42.411 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) -318.72454  139.19931  -2.290   0.0222 *
+## year           0.16929    0.06954   2.434   0.0151 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 12.73 on 1097 degrees of freedom
+## Multiple R-squared:  0.005373,	Adjusted R-squared:  0.004466 
+## F-statistic: 5.926 on 1 and 1097 DF,  p-value: 0.01508</code></pre></figure>
+
+<p>We see that the p-value for the coefficient for year is actually significant, and is equal to <code>0.16929</code>, which is again quite negligile in practical terms. In addition, the r-squared of the model is: <code>summary(model)$r.squared</code> which indicates an extremely poor model, and thus it’s evidence against a linear relationship between year of the plane and average delay. In addition we also tried a polynomial model(indicated in red), but that returned a poor r-squared as well. Thus I don’t believe that there’s a practical relationship between the age of the plane the delays they face, at least for the data that is present in the nycflights13 dataset.</p>
+
+<h4 id="conclusion">Conclusion</h4>
+
+<p>In this post we used <code>join functions</code> in the <code>dplyr</code> package in order to generate new data frames for our analysis. We were able to use this information to visualize delays by airports via a map of the USA, and we were able to answer the question of whether or not the age of the plane had an influence of the average delay time of the plane.</p>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Contact Information:</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Kevin Yan</li>
+          <li><a href="mailto:kevin.yan@mail.utoronto.ca">kevin.yan@mail.utoronto.ca</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/yankev"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">yankev</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/k_yan88"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">k_yan88</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Hi, this is a blog that documents some of the cool things that I have learned and would like to document for myself, as well as share with others.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

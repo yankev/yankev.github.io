@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Intro to Dplyr on nycflights13 (Updated Jan 18)</title>
-  <meta name="description" content="IntroductionIn this entry I’m going to work through a sequence of analysis that will cover some of the main operations in dplyr. Dplyr is a tool in R that si...">
+  <title>test</title>
+  <meta name="description" content="IntroductionIn this entry I’m going to work through a sequence of analysis that will cover some of the main operations in dplyr. Dplyr is a tool in R that wi...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="127.0.0.1:4000/2016/01/12/dplyr_flights_update.html">
+  <link rel="canonical" href="127.0.0.1:4000/otherwork/test/">
   <link rel="alternate" type="application/rss+xml" title="Kevin's blog" href="127.0.0.1:4000/feed.xml">
 
 </head>
@@ -67,16 +67,8 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-
-  <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">Intro to Dplyr on nycflights13 (Updated Jan 18)</h1>
-    <p class="post-meta"><time datetime="2016-01-12T10:46:55-05:00" itemprop="datePublished">Jan 12, 2016</time></p>
-  </header>
-
-  <div class="post-content" itemprop="articleBody">
-    <h3 id="introduction">Introduction</h3>
-<p>In this entry I’m going to work through a sequence of analysis that will cover some of the main operations in dplyr. Dplyr is a tool in R that simplifies, and thus standardizes functions that you would generally perform on dataframes using base R functons. It will allow us to query the dataframe similar to what is possible in SQL.</p>
+        <h3 id="introduction">Introduction</h3>
+<p>In this entry I’m going to work through a sequence of analysis that will cover some of the main operations in dplyr. Dplyr is a tool in R that will frame our data into a data-structure called a dataframe(different than the standard on in R). It will allow us to query the dataframe similar to what is possible in SQL.</p>
 
 <blockquote>
   <p>The main operations in dplyr are:</p>
@@ -162,88 +154,40 @@ g <span class="o">+</span> geom_bar<span class="p">(</span>map<span class="o">=<
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r">ok_flights <span class="o">&lt;-</span> filter<span class="p">(</span>temp<span class="p">,</span> arr_delay<span class="o">&lt;=</span><span class="m">2</span><span class="p">,</span> dep_delay<span class="o">&lt;=</span><span class="m">2</span><span class="p">)</span></code></pre></figure>
 
-<p>Now with this data set, we could ask: <code>Which airlines have the most "acceptable" delays(including flights ahead of schedule)?</code>.</p>
+<p>Now an interesting question we could ask is: <code>Which airlines on average have the most delays?</code>.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r">ok_flights <span class="o">%&gt;%</span>
 group_by<span class="p">(</span>carrier<span class="p">)</span> <span class="o">%&gt;%</span>
-summarise<span class="p">(</span>num_tot_delay <span class="o">=</span> n<span class="p">())</span> <span class="o">%&gt;%</span>
-arrange<span class="p">(</span>desc<span class="p">(</span>num_tot_delay<span class="p">))</span></code></pre></figure>
+summarise<span class="p">(</span>avg_tot_delay <span class="o">=</span> <span class="kp">mean</span><span class="p">(</span>total_delay<span class="p">,</span> na.rm<span class="o">=</span><span class="kc">TRUE</span><span class="p">))</span> <span class="o">%&gt;%</span>
+arrange<span class="p">(</span>desc<span class="p">(</span>avg_tot_delay<span class="p">))</span></code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-text" data-lang="text">## Source: local data frame [16 x 2]
 ## 
-##    carrier num_tot_delay
-##      (chr)         (int)
-## 1       UA         28840
-## 2       DL         28489
-## 3       B6         27855
-## 4       EV         24782
-## 5       AA         19472
-## 6       MQ         13291
-## 7       US         12396
-## 8       9E          9374
-## 9       WN          5394
-## 10      VX          2737
-## 11      FL          1210
-## 12      AS           467
-## 13      YV           269
-## 14      HA           234
-## 15      F9           224
-## 16      OO            18</code></pre></figure>
+##    carrier avg_tot_delay
+##      (chr)         (dbl)
+## 1       FL     -15.52893
+## 2       WN     -17.51483
+## 3       F9     -18.04911
+## 4       MQ     -18.32812
+## 5       B6     -18.65148
+## 6       US     -18.81534
+## 7       EV     -19.07062
+## 8       DL     -21.07224
+## 9       UA     -21.18221
+## 10      OO     -21.94444
+## 11      YV     -22.96654
+## 12      AA     -23.31697
+## 13      VX     -23.74205
+## 14      9E     -24.38127
+## 15      HA     -27.57265
+## 16      AS     -32.29764</code></pre></figure>
 
-<p>In this example we made use of multiple pipes. Moreover, we introduced the <code>group_by()</code> function, which was used to the dataframe into subsets based on the carrier. We then looked at the average total delay for all the flights for each different airline using the <code>summarise()</code> function. Lastly, we used the <code>arrange()</code> function in order to look at the flights with the most “acceptable” delays. In fact we do see UA and DELTA which are probably handle the most traffic, and thus this analysis might not actually tell us much about the quality of their services.</p>
-
-<p>If we were to use <code>ok_flights</code>, a more appropriate question would be to see which carrier had the shortest delays on average, given that they were acceptable flights.</p>
-
-<figure class="highlight"><pre><code class="language-r" data-lang="r">ok_flights <span class="o">%&gt;%</span>
-group_by<span class="p">(</span>carrier<span class="p">)</span> <span class="o">%&gt;%</span>
-summarise<span class="p">(</span>mean_tot_delay <span class="o">=</span> <span class="kp">mean</span><span class="p">(</span>total_delay<span class="p">))</span> <span class="o">%&gt;%</span>
-arrange<span class="p">(</span>mean_tot_delay<span class="p">)</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-text" data-lang="text">## Source: local data frame [16 x 2]
-## 
-##    carrier mean_tot_delay
-##      (chr)          (dbl)
-## 1       AS      -32.29764
-## 2       HA      -27.57265
-## 3       9E      -24.38127
-## 4       VX      -23.74205
-## 5       AA      -23.31697
-## 6       YV      -22.96654
-## 7       OO      -21.94444
-## 8       UA      -21.18221
-## 9       DL      -21.07224
-## 10      EV      -19.07062
-## 11      US      -18.81534
-## 12      B6      -18.65148
-## 13      MQ      -18.32812
-## 14      F9      -18.04911
-## 15      WN      -17.51483
-## 16      FL      -15.52893</code></pre></figure>
-
-<p>One last thing we could do is to look at the previous bar graph, and create one that symbolizes what proportion of flights were acceptable in a visual manner, although we can see this from the original, let’s just make use of some cool settings in ggplot.</p>
-
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#first we need to create a new variable that indicates whether a flight was</span>
-<span class="c1">#indeed an acceptable flight</span>
-temp2 <span class="o">&lt;-</span> mutate<span class="p">(</span>temp<span class="p">,</span> acceptable <span class="o">=</span> <span class="p">(</span>arr_delay<span class="o">&lt;=</span><span class="m">2</span> <span class="o">&amp;</span> dep_delay<span class="o">&lt;=</span><span class="m">2</span><span class="p">))</span>
-g2<span class="o">&lt;-</span>ggplot<span class="p">(</span>data<span class="o">=</span>temp2<span class="p">)</span>
-g2 <span class="o">+</span> geom_bar<span class="p">(</span>mapping<span class="o">=</span>aes<span class="p">(</span>x<span class="o">=</span>total_delay<span class="p">,</span>fill<span class="o">=</span>acceptable<span class="p">))</span> <span class="o">+</span> xlim<span class="p">(</span><span class="m">-100</span><span class="p">,</span><span class="m">1000</span><span class="p">)</span> <span class="o">+</span> labs<span class="p">(</span>title<span class="o">=</span><span class="s">&quot;A look at the distribution of delays&quot;</span><span class="p">)</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-text" data-lang="text">## Warning: Removed 9482 rows containing non-finite values (stat_count).</code></pre></figure>
-
-<p><img src="http://yankev.github.io/figs/dplyr_flights/unnamed-chunk-9-1.png" alt="center" /></p>
-
-<p><strong>Woah</strong>, this is kind of weird, there are some un-acceptable flights with total delays less than 0. But remember the conditions for an acceptable flight were no arrival or departure delays longer than 2 hours; However some of these flights indicate cases where for example, dep_delay = 5, but arr_delay=-10. <strong>phew!</strong>.
-However, now the question is whether our conditions for acceptability are valid, because of their inconsistency with total_delay, but that’s a question we’ll leave for the moment.</p>
+<p>In this example we made use of multiple pipes. Moreover, we introduced the <code>group_by()</code> function, which was used to the dataframe into subsets based on the carrier. We then looked at the average total delay for all the flights for each different airline using the <code>summarise()</code> function. Lastly, we used the <code>arrange()</code> function in order to look at the flights with the most delays, and to our surprise, they happen to be negative.</p>
 
 <h4 id="in-closing">In closing</h4>
 
 <p>We took a brief look at the operations included in the dplyr package, and how simple it was for us to do some initial exploratory analysis on the data set.</p>
 
-<h5 id="corrections-redefined-the-dplyr-package-in-the-intro">Corrections: Redefined the dplyr package in the Intro.</h5>
-
-  </div>
-
-</article>
 
       </div>
     </div>
