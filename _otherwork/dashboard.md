@@ -1,5 +1,5 @@
 ---
-title: Plotly Dashboard
+title: Plotly Dashboard in R
 layout: default
 date: January 21, 2016
 ---

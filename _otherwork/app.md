@@ -1,5 +1,5 @@
 ---
-title: Shiny Dashboard
+title: Shiny Dashboard in R
 date: January 21, 2016
 layout: default
 ---
