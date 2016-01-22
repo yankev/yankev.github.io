@@ -65,7 +65,7 @@ shinyApp(ui = ui, server = server)
 
 ###Below is an image of the output.
 
-![alt text]({{site.baseurl}}/figs/shiny/image.png)
+![alt text](http://yankev.github.io/figs/shiny/image.png)
 
 
 

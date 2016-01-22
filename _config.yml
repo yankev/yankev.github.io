@@ -12,7 +12,7 @@ email: kevin.yan@mail.utoronto.ca
 description: > # this means to ignore newlines until "baseurl:"
  Hi, this is a blog that documents some of the cool things that I have learned
  and would like to document for myself, as well as share with others.
-baseurl: "http://yankev.github.io" # the subpath of your site, e.g. /blog
+baseurl: "" # the subpath of your site, e.g. /blog
 url: "127.0.0.1:4000" # the base hostname & protocol for your site
 twitter_username: k_yan88
 github_username:  yankev
