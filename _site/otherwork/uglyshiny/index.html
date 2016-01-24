@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Ugly Shiny Demo with Plotly graphs</title>
-  <meta name="description" content="">
+  <meta name="description" content="Shiny Dashboard Demo and Thoughts">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="canonical" href="127.0.0.1:4000/otherwork/uglyshiny/">
@@ -50,7 +50,7 @@
           
         
           
-          <a class="page-link" href="/otherwork.html">Other</a>
+          <a class="page-link" href="/otherwork/">Other</a>
           
         
           
@@ -68,7 +68,41 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <iframe src="https://yankev.shinyapps.io/Movies/" style="border: none; width: 1000px; height: 800px"></iframe>
+        <h2 id="shiny-dashboard-demo-and-thoughts">Shiny Dashboard Demo and Thoughts</h2>
+
+<p>Below is a dashboard style shiny project that includes Plotly graphs. This dashboard is hosted on <code>shinyapps.io</code>.
+In order to create the layout I used the <code>fluidRow</code> and <code>column</code> function in the shiny library. However this didn’t seem to work to well when putting the Plotly graphs side by side, hence their reduced size.</p>
+
+<p>It appears that using Shiny to create Plotly dashboards may be less visually appealing, (at least without some html css touchups that you may have to include yourself) compared to using the <code>Dashboard.ly</code> web API.</p>
+
+<p>However an issue that I found when using this web API in R was the ability to properly format my data into a json string. 
+That had to be done using the <code>json.dump</code> function found in the <code>json</code> library in Python.</p>
+
+<h3 id="heres-the-code-used-in-uir">Here’s the code used in <code>ui.R</code>:</h3>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r">shinyUI<span class="p">(</span>fluidPage<span class="p">(</span>
+		titlePanel<span class="p">(</span>
+		  fluidRow<span class="p">(</span>
+		  column<span class="p">(</span><span class="m">5</span><span class="p">,</span>
+		  sliderInput<span class="p">(</span><span class="s">&quot;bins&quot;</span><span class="p">,</span> <span class="s">&quot;Number of bins:&quot;</span><span class="p">,</span> min <span class="o">=</span> <span class="m">1</span><span class="p">,</span> max <span class="o">=</span> <span class="m">50</span><span class="p">,</span> value <span class="o">=</span> <span class="m">10</span><span class="p">))</span>
+		  <span class="p">,</span>
+		  column<span class="p">(</span><span class="m">3</span><span class="p">,</span>
+		  selectInput<span class="p">(</span><span class="s">&quot;colour1&quot;</span><span class="p">,</span> <span class="s">&quot;Choose a colour for the first plot:&quot;</span><span class="p">,</span> 
+		              choices <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;blue&quot;</span><span class="p">,</span> <span class="s">&quot;green&quot;</span><span class="p">,</span> <span class="s">&quot;red&quot;</span><span class="p">))),</span>
+		  column<span class="p">(</span><span class="m">3</span><span class="p">,</span>
+		  selectInput<span class="p">(</span><span class="s">&quot;colour2&quot;</span><span class="p">,</span> <span class="s">&quot;Choose a colour for the first plot:&quot;</span><span class="p">,</span> 
+		              choices <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;navy&quot;</span><span class="p">,</span> <span class="s">&quot;orange&quot;</span><span class="p">,</span> <span class="s">&quot;maroon&quot;</span><span class="p">))</span>
+		  <span class="p">))),</span>
+		mainPanel<span class="p">(</span>
+		      
+					column<span class="p">(</span><span class="m">6</span><span class="p">,</span>graphOutput<span class="p">(</span><span class="s">&quot;trendPlot&quot;</span><span class="p">)),</span>
+					column<span class="p">(</span><span class="m">6</span><span class="p">,</span> graphOutput<span class="p">(</span><span class="s">&quot;trendPlot2&quot;</span><span class="p">))</span>
+		      
+		<span class="p">)</span>
+	<span class="p">)</span>
+<span class="p">)</span></code></pre></figure>
+
+<iframe src="https://yankev.shinyapps.io/Movies/" style="border: none; width: 1000px; height: 800px"></iframe>
 
       </div>
     </div>
