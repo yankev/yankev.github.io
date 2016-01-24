@@ -38,5 +38,5 @@ shinyUI(fluidPage(
 		)
 	)
 )
-{% endhighlights %}
-<iframe src="https://yankev.shinyapps.io/Movies/" style="border: none; width: 1000px; height: 800px"></iframe>
+{% endhighlight %}
+<iframe src="https://yankev.shinyapps.io/Movies/" style="border: none; width: 800px; height: 800px"></iframe>
