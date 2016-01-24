@@ -31,9 +31,10 @@ shinyUI(fluidPage(
 		              choices = c("navy", "orange", "maroon"))
 		  ))),
 		mainPanel(
-		      
+		      		fluidRow(
 					column(6,graphOutput("trendPlot")),
 					column(6, graphOutput("trendPlot2"))
+					)
 		      
 		)
 	)
