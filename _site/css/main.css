@@ -149,13 +149,14 @@ pre {
  * Site header
  */
 .site-header {
-  border-top: 1px solid #424242;
+  background-image: url(../images/abstract-patterns_00394702.jpg);
+  background-size: cover;
   border-bottom: 1px solid #e8e8e8;
-  min-height: 60px;
-  background-image: url("/images/background.jpg");
+  min-height: 56px;
   position: relative; }
 
 .site-title {
+  color: #e8e8e8;
   font-size: 30px;
   font-weight: 300;
   line-height: 56px;
@@ -163,7 +164,7 @@ pre {
   margin-bottom: 0;
   float: left; }
   .site-title, .site-title:visited {
-    color: #424242; }
+    color: rgba(231, 235, 238, 0.85); }
 
 .site-nav {
   float: right;
@@ -171,7 +172,7 @@ pre {
   .site-nav .menu-icon {
     display: none; }
   .site-nav .page-link {
-    color: #111;
+    color: #e8e8e8;
     line-height: 1.5; }
     .site-nav .page-link:not(:last-child) {
       margin-right: 20px; }
