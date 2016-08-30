@@ -4,4 +4,4 @@ title: To do
 permalink: /todo/
 ---
 
-1. Work in progress
+1. Get back to making more blog posts!!
