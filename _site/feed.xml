@@ -6,20 +6,197 @@
 </description>
     <link>127.0.0.1:4000/</link>
     <atom:link href="127.0.0.1:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 09 Jul 2016 00:32:16 -0400</pubDate>
-    <lastBuildDate>Sat, 09 Jul 2016 00:32:16 -0400</lastBuildDate>
+    <pubDate>Mon, 15 May 2017 11:34:19 -0400</pubDate>
+    <lastBuildDate>Mon, 15 May 2017 11:34:19 -0400</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
-        <title>Basic d3</title>
+        <title>Simple Elm App w/ Spotify API</title>
         <description>&lt;h3 id=&quot;introduction&quot;&gt;Introduction&lt;/h3&gt;
-&lt;p&gt;d3 is a data visualization package written in javascript. It’s being used everywhere to make
-interactive and engaging visualizations to better portray the meaning behind collections of data.
-Most notably you will find these visualizations on the &lt;code&gt;New York Times webpage&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;I just pieced this together after reading and looking at examples from the official elm guides. It makes use of an HTTP request to the Spotify API, and an instance of the json decoder to extract the image url from the response and displays it. There’s a search bar that allows you to specify the artist’s picture that you want, and a &lt;code&gt;searching&lt;/code&gt; status bar that will indicate the status of your search.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;module Nested exposing (..)
+
+import Html exposing (..)
+import Http exposing (get, send)
+import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (src, style)
+import Json.Decode exposing (at, int, string, list, decodeString, Decoder)
+import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional, hardcoded)
+
+
+-- Spotify Artist Decoders
+
+
+type alias Artist =
+    { name : String
+    , uri : String
+    , images : List String
+    }
+
+
+imageDecoder : Decoder String
+imageDecoder =
+    at [ &amp;quot;url&amp;quot; ] string
+
+
+artistDecoder : Decoder Artist
+artistDecoder =
+    decode Artist
+        |&amp;gt; required &amp;quot;name&amp;quot; string
+        |&amp;gt; required &amp;quot;uri&amp;quot; string
+        |&amp;gt; required &amp;quot;images&amp;quot; (list imageDecoder)
+
+
+type alias ArtistList =
+    { artists : List Artist }
+
+
+artistObjectDecoder : Decoder ArtistList
+artistObjectDecoder =
+    decode ArtistList
+        |&amp;gt; requiredAt [ &amp;quot;artists&amp;quot;, &amp;quot;items&amp;quot; ] (list artistDecoder)
+
+
+
+-- Functions returning messages or impure actions
+
+
+updateSearchCriteria : String -&amp;gt; Msg
+updateSearchCriteria text =
+    UpdateSearchCriteria text
+
+
+getSpotifyArtist : String -&amp;gt; Cmd Msg
+getSpotifyArtist name =
+    let
+        url =
+            &amp;quot;https://api.spotify.com/v1/search?q=&amp;quot; ++ name ++ &amp;quot;&amp;amp;type=artist&amp;quot;
+    in
+        Http.send NewArtist (Http.get url artistObjectDecoder)
+
+
+
+-- MODEL/VIEW/UPDATE
+
+
+type alias Model =
+    { results : String
+    , searchCriteria : String
+    , artistPic : String
+    , isSearching : Bool
+    }
+
+
+model : Model
+model =
+    Model &amp;quot;&amp;quot; &amp;quot;&amp;quot; &amp;quot;&amp;quot; False
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( model, Cmd.none )
+
+
+view : Model -&amp;gt; Html Msg
+view model =
+    let
+        ( fontColor, searchText ) =
+            if (model.isSearching) then
+                ( &amp;quot;red&amp;quot;, &amp;quot;Searching&amp;quot; )
+            else
+                ( &amp;quot;green&amp;quot;, &amp;quot;Done&amp;quot; )
+    in
+        div []
+            [ div [ style [ ( &amp;quot;color&amp;quot;, fontColor ) ] ] [ text searchText ]
+            , input [ onInput updateSearchCriteria ] []
+            , button [ onClick Search ] [ text &amp;quot;Search&amp;quot; ]
+            , div [] [ text model.results ]
+            , img
+                [ (src
+                    (if String.length model.artistPic &amp;gt; 0 then
+                        model.artistPic
+                     else
+                        &amp;quot;http://www.graphics99.com/wp-content/uploads/2012/07/simpsons-with-his-small-family.jpg&amp;quot;
+                    )
+                  )
+                ]
+                []
+            ]
+
+
+type Msg
+    = None
+    | UpdateSearchCriteria String
+    | NewArtist (Result Http.Error ArtistList)
+    | Search
+
+
+update : Msg -&amp;gt; Model -&amp;gt; ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        None -&amp;gt;
+            ( model, Cmd.none )
+
+        UpdateSearchCriteria text -&amp;gt;
+            ( { model | searchCriteria = text }, Cmd.none )
+
+        NewArtist json -&amp;gt;
+            case json of
+                Ok x -&amp;gt;
+                    let
+                        ( name, pic ) =
+                            case (List.head x.artists) of
+                                Just a -&amp;gt;
+                                    let
+                                        pic =
+                                            case List.head a.images of
+                                                Just pic_url -&amp;gt;
+                                                    pic_url
+
+                                                Nothing -&amp;gt;
+                                                    &amp;quot;Nothing&amp;quot;
+                                    in
+                                        ( a.name, pic )
+
+                                Nothing -&amp;gt;
+                                    ( &amp;quot;Broken&amp;quot;, &amp;quot;No Image&amp;quot; )
+                    in
+                        ( { model | artistPic = pic, results = name, isSearching = False }, Cmd.none )
+
+                Err msg -&amp;gt;
+                    ( { model | results = toString msg, isSearching = False }, Cmd.none )
+
+        Search -&amp;gt;
+            ( { model | isSearching = True }, getSpotifyArtist model.searchCriteria )
+
+
+main : Program Never Model Msg
+main =
+    Html.program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -&amp;gt; Sub Msg
+subscriptions model =
+    Sub.none&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h4 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h4&gt;
+&lt;p&gt;&lt;a href=&quot;http://yankev.github.io/elm-demos/spotify.html&quot;&gt;Check it out here&lt;/a&gt;
+(Just a heads up, it probably needs some styling :p)&lt;/p&gt;
 </description>
-        <pubDate>Sat, 09 Jul 2016 00:00:00 -0400</pubDate>
-        <link>127.0.0.1:4000/2016/07/09/first-d3.html</link>
-        <guid isPermaLink="true">127.0.0.1:4000/2016/07/09/first-d3.html</guid>
+        <pubDate>Mon, 18 Jan 2016 18:46:00 -0500</pubDate>
+        <link>127.0.0.1:4000/2016/01/18/elm.html</link>
+        <guid isPermaLink="true">127.0.0.1:4000/2016/01/18/elm.html</guid>
         
         
       </item>
