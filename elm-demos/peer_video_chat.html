@@ -8,7 +8,7 @@
             var sendMessageBox = document.getElementById("sendMessageBox");
             var sendButton = document.getElementById("sendButton");
             var clearMsgsButton = document.getElementById("clearMsgsButton");
-
+            const audio = document.querySelector('audio');
             var peer = new Peer();
             peer.on('open', function (id) {
                 console.log('My peer ID is: ' + id);
@@ -20,21 +20,17 @@
                     });
 
             });
-
-            navigator.mediaDevices.getUserMedia({ audio: true })
+            const constraints = { audio: true };
+            navigator.mediaDevices.getUserMedia(constraints)
             .then(function(stream) {
             console.log('streaming?');
-            
-            window.AudioContext = window.AudioContext ||
-            window.webkitAudioContext;
-            var x = document.createElement("AUDIO");
-            document.body.appendChild(x);
-            const microphone = context.createMediaStreamSource(stream);
-            const filter = context.createBiquadFilter();
-            // microphone -> filter -> destination
-            microphone.connect(filter);
-            filter.connect(context.destination);
+            const audioTracks = stream.getAudioTracks();
+            console.log('Got stream with constraints:', constraints);
+            console.log('Using audio device: ' + audioTracks[0].label);
+            window.stream = stream; // make variable available to browser console
+            audio.srcObject = stream;
 
+            console.log("audio all set")
 
             document.getElementById("myBtn").addEventListener("click", function () {
                 connectVal = document.getElementById("connectWithID").value;
@@ -71,5 +67,7 @@
     <p>
         Input: <input id="connectWithID" type="text" /> <button id="myBtn">Connect</button>
     </p>
+    <audio id="gum-local" controls autoplay></audio>
+
 
 </body>
