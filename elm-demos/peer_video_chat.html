@@ -1,62 +1,56 @@
-
 <head>
     <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js">
     </script>
     <script>
 
-        window.addEventListener('DOMContentLoaded', (event) => {
-            var sendMessageBox = document.getElementById("sendMessageBox");
-            var sendButton = document.getElementById("sendButton");
-            var clearMsgsButton = document.getElementById("clearMsgsButton");
-            const audio = document.querySelector('audio');
-            var peer = new Peer();
-            peer.on('open', function (id) {
-                console.log('My peer ID is: ' + id);
-                document.getElementById('peer_id').innerHTML = id;
+        const constraints = { audio: true };
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(function (stream) {
+                const audio = document.querySelector('audio');
+                var peer = new Peer();
+                peer.on('open', function (id) {
+                    console.log('My peer ID is: ' + id);
+                    document.getElementById('peer_id').innerHTML = id;
 
-                peer.on('call', function (call) {
-                    console.log('connected?>');
-                    call.answer(mediaStream);
+                    peer.on('call', function (call) {
+                        console.log('connected?>');
+                        call.answer(stream);
                     });
-
-            });
-            const constraints = { audio: true };
-            navigator.mediaDevices.getUserMedia(constraints)
-            .then(function(stream) {
-            console.log('streaming?');
-            const audioTracks = stream.getAudioTracks();
-            console.log('Got stream with constraints:', constraints);
-            console.log('Using audio device: ' + audioTracks[0].label);
-            window.stream = stream; // make variable available to browser console
-            audio.srcObject = stream;
-
-            console.log("audio all set")
-
-            document.getElementById("myBtn").addEventListener("click", function () {
-                connectVal = document.getElementById("connectWithID").value;
-                console.log(connectVal);
-                var conn = peer.call(connectVal, stream);
-                conn.on('open', function () {
-                    // Receive messages
-                    conn.on('data', function (data) {
-                        console.log('Received', data);
-                        addMessage("<span class=\"peerMsg\">Peer:</span> " + data);
-                    });
-
-                    // Send messages
-                    conn.send('Hello I am the connector!');
-
-                    addEventListeners(conn);
                 });
-            
-            });
-            
-        })
-            .catch(function(err) {
-            console.log('failed');
-            });
+                    console.log('streaming?');
+                    const audioTracks = stream.getAudioTracks();
+                    console.log('Got stream with constraints:', constraints);
+                    console.log('Using audio device: ' + audioTracks[0].label);
+                    window.stream = stream; // make variable available to browser console
+                    audio.srcObject = stream;
 
-            });
+                    console.log("audio all set")
+
+                    document.getElementById("myBtn").addEventListener("click", function () {
+                        connectVal = document.getElementById("connectWithID").value;
+                        console.log(connectVal);
+                        var conn = peer.call(connectVal, stream);
+                        console.log(conn);
+                        conn.on('open', function () {
+                            // Receive messages
+                            conn.on('data', function (data) {
+                                console.log('Received', data);
+                                addMessage("<span class=\"peerMsg\">Peer:</span> " + data);
+                            });
+
+                            // Send messages
+                            conn.send('Hello I am the connector!');
+
+                            addEventListeners(conn);
+                        });
+
+                    });
+
+                })
+                    .catch(function (err) {
+                        console.log('failed');
+                    });
+
     </script>
 </head>
 
